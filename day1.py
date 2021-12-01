@@ -9,20 +9,25 @@ counter = 1
 increasing = 0
 decreasing = 0
 nochange = 0
-
 with open(target) as f:
     for line in f:
         if line not in ['\n', '\r\n']:
             curr = int(line.rstrip())
             if counter == 1:
                 prev = curr
-                pass
-            if curr > prev:
-                increasing += 1
+                nochange += 1
+            else:
+                if curr > prev:
+                    increasing += 1
+                elif curr < prev:
+                    decreasing += 1
+                else:
+                    nochange += 1
+            # print(f"{counter} | {prev} {curr} | {increasing} {decreasing}")
 
             prev = curr
             counter += 1
 
-print(f"increasing: {increasing}")#, decreasing, nochange)
+print(f"increasing: {increasing}\ndecreasing: {decreasing}\nno change: {nochange}")#, decreasing, nochange)
 # 1461 is too low
 # 1800? is too high
