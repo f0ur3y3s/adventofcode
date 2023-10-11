@@ -1,0 +1,193 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    int low;
+    int high;
+    int id;
+} bot_t;
+
+typedef struct {
+    int value;
+} output_t;
+
+int
+hasBoth(bot_t *bot)
+{
+    return (bot->low != 0 && bot->high != 0);
+}
+
+void
+initBots(bot_t *bots, size_t size)
+{
+    for (int idx = 0; idx < size; idx ++)
+    {
+        bots[idx].low = 0;
+        bots[idx].high = 0;
+        bots[idx].id = idx;
+    }
+}
+
+void
+initOutputs(output_t *output, size_t size)
+{
+    for (int idx = 0; idx < size; idx ++)
+    {
+        output[idx].value = 0;
+    }
+}
+
+void
+checkSpecial(bot_t *bot)
+{
+    if (bot->low == 17 && bot->high == 61)
+    {
+        printf("Special bot found: %d\n", bot->id);
+        exit(EXIT_SUCCESS);
+    }
+}
+
+void
+addChip(bot_t *bot, int chip_value)
+{
+    if (bot->low != 0)
+    {
+        if (bot->low < chip_value)
+        {
+            bot->high = chip_value;
+        }
+        else
+        {
+            bot->high = bot->low;
+            bot->low = chip_value;
+        }
+    }
+    else
+    {
+        bot->low = chip_value;
+    }
+}
+
+void
+populateChips(FILE *p_input_file, bot_t *all_bots)
+{
+    char line[64];
+    while(fscanf(p_input_file, "%[^\n]\n", line) != EOF)
+    {
+        char junk[64];
+        int chip_value;
+        int bot_id;
+        if (sscanf(line, "%s %d %s %s %s %d", junk, &chip_value, junk, junk, junk, &bot_id) == 6)
+        {
+            addChip(&(all_bots[bot_id]), chip_value);
+        }
+    }
+    rewind(p_input_file);
+}
+
+int
+getRemoveLow(bot_t *bot)
+{
+    int value = bot->low;
+    bot->low = 0;
+    return value;
+}
+
+int
+getRemoveHigh(bot_t *bot)
+{
+    int value = bot->high;
+    bot->high = 0;
+    return value;
+}
+
+void
+addOutputChip(output_t *output, int chip_value)
+{
+    output->value = chip_value;
+}
+
+void
+scanFile(FILE *p_input_file, bot_t all_bots[256], size_t all_bots_length, output_t outputs[64])
+{
+    char line[64];
+
+    while(fscanf(p_input_file, "%[^\n]\n", line) != EOF)
+    {
+        char junk[64];
+        int from_bot_id;
+        int low_to;
+        int high_to;
+        char low_dest[8];
+        char high_dest[8];
+        if (sscanf(line, "%s %d %s %s %s %s %d %s %s %s %s %d", junk, &from_bot_id, junk, junk, junk, low_dest, &low_to, junk, junk, junk, high_dest, &high_to) == 12)
+        {
+            if (!hasBoth(&(all_bots[from_bot_id])))
+            {
+                continue;
+            }
+            int low = getRemoveLow(&(all_bots[from_bot_id]));
+            int high = getRemoveHigh(&(all_bots[from_bot_id]));
+
+            if (strcmp(low_dest, "bot") == 0)
+            {
+                addChip(&(all_bots[low_to]), low);
+            }
+            if (strcmp(high_dest, "bot") == 0)
+            {
+                addChip(&(all_bots[high_to]), high);
+            }
+            if (strcmp(low_dest, "output") == 0)
+            {
+                printf("From %d \tLow to %s\tValue %d\tHigh to %s\tValue %d\n", from_bot_id, low_dest, low_to, high_dest, high_to);
+                addOutputChip(&(outputs[low_to]), low);
+            }
+            if (strcmp(high_dest, "output") == 0)
+            {
+                printf("From %d \tLow to %s\tValue %d\tHigh to %s\tValue %d\n", from_bot_id, low_dest, low_to, high_dest, high_to);
+                addOutputChip(&(outputs[high_to]), high);
+            }
+
+            printf("Total output 0: %d\n", outputs[0].value);
+            printf("Total output 1: %d\n", outputs[1].value);
+            printf("Total output 2: %d\n", outputs[2].value);
+            printf("Multiplied value: %d\n", outputs[0].value*outputs[1].value*outputs[2].value );
+            if (low == 2 && high == 5)
+            {
+                printf("Found special: %d\n", from_bot_id);
+            }
+        }
+    }
+    rewind(p_input_file);
+}
+
+int
+main(int argc, char *argv[])
+{
+    if (argc != 2)
+    {
+        printf("Usage: %s [file]\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+
+    FILE *p_input_file;
+    p_input_file = fopen(argv[1],"r");
+    if (!p_input_file)
+    {
+        printf("Error opening file.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    bot_t all_bots[256];
+    size_t all_bots_length = sizeof(all_bots)/sizeof(bot_t);
+    initBots(all_bots, all_bots_length);
+    populateChips(p_input_file, all_bots);
+    output_t outputs[32];
+    initOutputs(outputs, sizeof(outputs)/sizeof(output_t));
+
+    for (;;)
+    {
+        scanFile(p_input_file, all_bots, all_bots_length, outputs);
+    }
+}
