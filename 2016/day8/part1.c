@@ -4,48 +4,11 @@
 #define MAX_COLS 50
 #define MAX_ROWS 6
 
-void
-initScreen(char screen[MAX_ROWS][MAX_COLS])
-{
-    for (int row = 0; row < MAX_ROWS; row++)
-    {
-        for (int col = 0; col < MAX_COLS; col++)
-        {
-            screen[row][col] = '.';
-        }
-    }
-}
-
-void
-printScreen(char screen[MAX_ROWS][MAX_COLS])
-{
-    for (int row = 0; row < MAX_ROWS; row++)
-    {
-        for (int col = 0; col < MAX_COLS; col++)
-        {
-            printf("%c", screen[row][col]);
-        }
-        printf("\n");
-    }
-}
-
-void
-initRect(char screen[MAX_ROWS][MAX_COLS], int width, int height)
-{
-    for (int row = 0; row < height; row++)
-    {
-        for (int col = 0; col < width; col++)
-        {
-            screen[row][col] = '#';
-        }
-    }
-}
-
-void
-rotate()
-{
-
-}
+void initScreen(char screen[MAX_ROWS][MAX_COLS]);
+void printScreen(char screen[MAX_ROWS][MAX_COLS]);
+void initRect(char screen[MAX_ROWS][MAX_COLS], int width, int height);
+void rotate(char screen[MAX_ROWS][MAX_COLS], int target, int amount, int is_row);
+int countLit(char screen[MAX_ROWS][MAX_COLS]);
 
 int
 main(int argc, char *argv[])
@@ -91,7 +54,6 @@ main(int argc, char *argv[])
 
         else
         {
-            // rotate column x=1 by 1
             token = strtok(NULL, " ");
             sscanf(token, "%s", target);
             if (strcmp(token, "column") == 0)
@@ -101,6 +63,7 @@ main(int argc, char *argv[])
                 token = strtok(NULL, " ");
                 token = strtok(NULL, " ");
                 sscanf(token, "%d", &amount);
+                rotate(screen, x, amount, 0);
                 printf("rotate column\t%d\t%d\n", x, amount);
             }
             else
@@ -110,14 +73,99 @@ main(int argc, char *argv[])
                 token = strtok(NULL, " ");
                 token = strtok(NULL, " ");
                 sscanf(token, "%d", &amount);
+                rotate(screen, y, amount, 1);
                 printf("rotate row\t%d\t%d\n", y, amount);
             }
             token = strtok(NULL, " ");
-            // printf("rotate\t%s\n", target);
         }
         token = strtok(NULL, " ");
         printScreen(screen);
     }
 
+    int count = countLit(screen);
+    printf("Number of lit pixels: %d\n", count);
     fclose(p_input_file);
+}
+
+
+void
+initScreen(char screen[MAX_ROWS][MAX_COLS])
+{
+    for (int row = 0; row < MAX_ROWS; row++)
+    {
+        for (int col = 0; col < MAX_COLS; col++)
+        {
+            screen[row][col] = '.';
+        }
+    }
+}
+
+void
+printScreen(char screen[MAX_ROWS][MAX_COLS])
+{
+    for (int row = 0; row < MAX_ROWS; row++)
+    {
+        for (int col = 0; col < MAX_COLS; col++)
+        {
+            printf("%c", screen[row][col]);
+        }
+        printf("\n");
+    }
+}
+
+void
+initRect(char screen[MAX_ROWS][MAX_COLS], int width, int height)
+{
+    for (int row = 0; row < height; row++)
+    {
+        for (int col = 0; col < width; col++)
+        {
+            screen[row][col] = '#';
+        }
+    }
+}
+
+void
+rotate(char screen[MAX_ROWS][MAX_COLS], int target, int amount, int is_row)
+{
+    char temp[MAX_COLS];
+    if (is_row)
+    {
+        for (int col = 0; col < MAX_COLS; col++)
+        {
+            temp[col] = screen[target][col];
+        }
+        for (int col = 0; col < MAX_COLS; col++)
+        {
+            screen[target][(col + amount) % MAX_COLS] = temp[col];
+        }
+    }
+    else
+    {
+        for (int row = 0; row < MAX_ROWS; row++)
+        {
+            temp[row] = screen[row][target];
+        }
+        for (int row = 0; row < MAX_ROWS; row++)
+        {
+            screen[(row + amount) % MAX_ROWS][target] = temp[row];
+        }
+    }
+}
+
+int
+countLit(char screen[MAX_ROWS][MAX_COLS])
+{
+    int count = 0;
+    for (int row = 0; row < MAX_ROWS; row++)
+    {
+        for (int col = 0; col < MAX_COLS; col++)
+        {
+            if (screen[row][col] == '#')
+            {
+                count++;
+            }
+        }
+    }
+    return count;
 }
