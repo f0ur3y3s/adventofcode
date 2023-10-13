@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-void *
-safe_malloc(size_t num_bytes, char *var_name, int line_num, const char *func_name)
+
+void* safe_malloc(size_t num_bytes, char *var_name, int line_num, const char *func_name)
 {
     void *p_malloc_location = NULL;
     p_malloc_location = malloc(num_bytes);
@@ -14,8 +14,7 @@ safe_malloc(size_t num_bytes, char *var_name, int line_num, const char *func_nam
     return p_malloc_location;
 }
 
-void *
-safe_realloc(void *ptr, size_t num_bytes, char *var_name, int line_num, const char *func_name)
+void* safe_realloc(void *ptr, size_t num_bytes, char *var_name, int line_num, const char *func_name)
 {
     void *p_realloc_location = NULL;
     p_realloc_location = realloc(ptr, num_bytes);
@@ -33,8 +32,7 @@ typedef struct {
     size_t capacity;
 } str_array;
 
-str_array *
-safe_malloc_str_array(void)
+str_array* safe_malloc_str_array(void)
 {
     str_array *p_new_array = (str_array *)safe_malloc(sizeof(str_array), "new_array", __LINE__, __func__);
     if (!p_new_array) {
@@ -47,21 +45,19 @@ safe_malloc_str_array(void)
     }
 
     p_new_array->size = 0;
-    p_new_array->capacity = 2;
+    p_new_array->capacity = 8;
 
     return p_new_array;
 }
 
-int
-append_str(str_array *str_arr, char *new_string)
+int append_str(str_array *str_arr, char *new_string)
 {
     if (!str_arr) {
         return 0;
     }
-    printf("Adding: %s\n", new_string);
     if (str_arr->size == str_arr->capacity) {
-        // printf("\nReallocing...\n\n");
-        char **tmp = (char **)safe_realloc(str_arr->pp_strings, 2 * str_arr->capacity * sizeof(char *), "tmp", __LINE__, __func__);
+        char **tmp = realloc(str_arr->pp_strings, 2 * str_arr->capacity * (strlen(new_string) + 1));
+        // char **tmp = (char **)safe_realloc(str_arr->pp_strings, 2 * str_arr->capacity * (strlen(new_string) + 1), "tmp", __LINE__, __func__);
         if (!tmp) {
             return 0;
         }
@@ -70,44 +66,39 @@ append_str(str_array *str_arr, char *new_string)
         str_arr->capacity *= 2;
     }
 
-    // Allocate memory for the new string on the heap
-    char *new_str = (char *)safe_malloc(strlen(new_string) + 1, "new_str", __LINE__, __func__);
-    if (!new_str) {
+    str_arr->pp_strings[str_arr->size] = strdup(new_string);
+    if (!str_arr->pp_strings[str_arr->size])
+    {
+        printf("Size does not match\n");
         return 0;
     }
-
-    // Copy the new string to the allocated memory
-    strcpy(new_str, new_string);
-
-    // Store the pointer to the new string in the array
-    str_arr->pp_strings[str_arr->size++] = new_str;
-
-    // str_arr->pp_strings[str_arr->size++] = new_string;
+    str_arr->size++;
     return 1;
 }
 
-void
-print_str_array(str_array* str_arr)
+void print_str_array(str_array* str_arr)
 {
-    for (int idx = 0; idx < str_arr->size; idx++)
+    if (!str_arr)
     {
-        printf("%s\n", str_arr->pp_strings[idx]);
+        return;
+    }
+    for (size_t idx = 0; idx < str_arr->size; idx++)
+    {
+        printf("Location: %p\t%s\n", &(str_arr->pp_strings[idx]), str_arr->pp_strings[idx]);
     }
 }
 
 void free_str_array(str_array *str_arr)
 {
     if (!str_arr)
+    {
         return;
+    }
 
-    // Free each individual string in the array
     for (size_t i = 0; i < str_arr->size; i++) {
         free(str_arr->pp_strings[i]);
     }
 
-    // Free the array of pointers to strings
     free(str_arr->pp_strings);
-
-    // Free the str_array structure itself
     free(str_arr);
 }

@@ -6,10 +6,13 @@
 int
 is_in_arr(str_array* map, char* name)
 {
+    // printf("Looking for %s\n", name);
     for (int idx = 0; idx < map->size; idx++)
     {
+        // printf("%s\t%s\n", name, map->pp_strings[idx]);
         if (strcmp(map->pp_strings[idx], name) == 0)
         {
+            // printf("Found! %s\n", name);
             return 1;
         }
     }
@@ -19,11 +22,12 @@ is_in_arr(str_array* map, char* name)
 void
 scan_file_locations(FILE* p_input_file, str_array* map)
 {
-    char city1[64];
-    char city2[64];
+    char city1;
+    char city2;
     int distance = 0;
     while (fscanf(p_input_file, "%s to %s = %d\n", city1, city2, &distance) != EOF)
     {
+        // printf("%s\t%s\n", city1, city2);
         if (!is_in_arr(map, city1))
         {
             append_str(map, city1);
@@ -32,7 +36,6 @@ scan_file_locations(FILE* p_input_file, str_array* map)
         {
             append_str(map, city2);
         }
-        // printf("%s\t%s\t%d\n", city1, city2, distance);
     }
     rewind(p_input_file);
 }
@@ -72,7 +75,9 @@ main(int argc, char *argv[])
     // {
     //     printf("%s\t%s\t%d\n", city1, city2, distance);
     // }
+    printf("%ld\t%ld\n", map->capacity, map->size);
 
     free_str_array(map);
+    fclose(p_input_file);
     exit(EXIT_SUCCESS);
 }

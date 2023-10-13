@@ -173,7 +173,6 @@ main(int argc, char *argv[])
         GridPoint temp_point = {x, y};
         addGridPoint(&grid, temp_point);
 
-        buffer[strcspn(buffer, "\n")] = '\0'; // remove newline
         for (int idx = 0; idx < read-1; idx++) {
             char current_char = buffer[idx];
             switch_direction(&santa_direction, &current_char);
