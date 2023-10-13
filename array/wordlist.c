@@ -1,106 +1,106 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <stdbool.h>
 #include <string.h>
 
+void* safe_malloc(size_t num_bytes, char *var_name, int line_num, const char *func_name)
+{
+    void *p_malloc_location = NULL;
+    p_malloc_location = malloc(num_bytes);
+    if (!p_malloc_location)
+    {
+        printf("Fatal: failed to allocate %ld bytes for variable '%s' on line '%d' in function '%s': Cannot allocate memory\n", num_bytes, var_name, line_num, func_name);
+        free(p_malloc_location);
+        return NULL;
+    }
+    return p_malloc_location;
+}
+
+void* safe_realloc(void *ptr, size_t num_bytes, char *var_name, int line_num, const char *func_name)
+{
+    void *p_realloc_location = NULL;
+    p_realloc_location = realloc(ptr, num_bytes);
+    if (!p_realloc_location)
+    {
+        printf("Fatal: failed to reallocate %ld bytes for variable '%s' on line '%d' in function '%s': Cannot allocate memory\n", num_bytes, var_name, line_num, func_name);
+        free(p_realloc_location);
+        return NULL;
+    }
+    return p_realloc_location;
+}
+
 typedef struct {
-        char **words;
-        size_t size;
-        size_t capacity;
-} wordlist;
+    char **words;
+    size_t size;
+    size_t capacity;
+} wordlist_t;
 
-wordlist *wordlist_create(void)
+wordlist_t* wordlist_create(void)
 {
-        wordlist *wl = malloc(sizeof(*wl));
-        if (!wl) {
-                return NULL;
-        }
-
-        // 8 seems like a reasonable starting capacity
-        wl->capacity = 8;
-        wl->size = 0;
-
-        wl->words = malloc(wl->capacity * sizeof(*wl->words));
-        if (!wl->words) {
-                // Remember to free any partial allocations
-                free(wl);
-                return NULL;
-        }
-
-        return wl;
-}
-
-
-bool wordlist_append(wordlist *wl, const char *s)
-{
-        if (!wl) {
-                return false;
-        }
-        if (wl->size == wl->capacity) {
-                char **tmp = realloc(wl->words, 2 * wl->capacity * (strlen(s)+1));
-                if (!tmp) {
-                        return false;
-                }
-
-                wl->words = tmp;
-                wl->capacity *= 2;
-        }
-
-        wl->words[wl->size] = strdup(s);
-        // Confirm that `strdup` succeeded
-        if (!wl->words[wl->size]) {
-                return false;
-        }
-
-        wl->size++;
-        return true;
-}
-
-void wordlist_print(const wordlist *wl)
-{
-    if (!wl) {
-            return;
+    wordlist_t *p_wordlist = (wordlist_t *)safe_malloc(sizeof(wordlist_t), "new_array", __LINE__, __func__);
+    if (!p_wordlist) {
+        return NULL;
     }
 
-    for (size_t n=0; n < wl->size; ++n) {
-            printf("%s\n", wl->words[n]);
+    p_wordlist->size = 0;
+    p_wordlist->capacity = 8;
+    
+    p_wordlist->words = (char **)safe_malloc(p_wordlist->capacity * sizeof(p_wordlist->words), "p_wordlist->words", __LINE__, __func__);
+    if (!p_wordlist->words) {
+        free(p_wordlist);
+        return NULL;
     }
+
+    return p_wordlist;
 }
 
-void wordlist_destroy(wordlist *wl)
+int wordlist_append(wordlist_t *str_arr, char *new_string)
 {
-    if (!wl) {
-            return;
+    if (!str_arr) {
+        return 0;
+    }
+    if (str_arr->size == str_arr->capacity) {
+        char **tmp = realloc(str_arr->words, 2 * str_arr->capacity * (strlen(new_string) + 1));
+        if (!tmp) {
+            return 0;
+        }
+
+        str_arr->words = tmp;
+        str_arr->capacity *= 2;
     }
 
-    for (size_t n=0; n < wl->size; ++n) {
-            free(wl->words[n]);
-    }
-
-    free(wl->words);
-    free(wl);
-}
-
-
-void main(void)
-{
-    wordlist* list = wordlist_create();
-    FILE *p_input_file;
-    p_input_file = fopen("test.txt","r");
-    if (!p_input_file)
+    str_arr->words[str_arr->size] = strdup(new_string);
+    if (!str_arr->words[str_arr->size])
     {
-        printf("Error opening file.\n");
-        exit(EXIT_FAILURE);
+        printf("Size does not match\n");
+        return 0;
     }
-    char* buffer;
-    while (fscanf(p_input_file, "%[^\n]\n", buffer) != EOF)
+    str_arr->size++;
+    return 1;
+}
+
+void wordlist_print(wordlist_t* str_arr)
+{
+    if (!str_arr)
     {
-        wordlist_append(list, buffer);
+        return;
+    }
+    for (size_t idx = 0; idx < str_arr->size; idx++)
+    {
+        printf("Location: %p\t%s\n", &(str_arr->words[idx]), str_arr->words[idx]);
+    }
+}
+
+void wordlist_free(wordlist_t *str_arr)
+{
+    if (!str_arr)
+    {
+        return;
     }
 
+    for (size_t i = 0; i < str_arr->size; i++) {
+        free(str_arr->words[i]);
+    }
 
-    fclose(p_input_file);
-    wordlist_print(list);
-    wordlist_destroy(list);
+    free(str_arr->words);
+    free(str_arr);
 }
