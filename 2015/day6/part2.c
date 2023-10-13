@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include "grid/grid.h"
 
-
-
 int
 main(int argc, char *argv[])
 {
@@ -32,7 +30,6 @@ main(int argc, char *argv[])
     {
         if (4 == sscanf(buffer, "turn on %d,%d through %d,%d", &x1, &y1, &x2, &y2))
         {
-            // turn on lights in rectangle
             for (int x = x1; x <= x2; x++)
             {
                 for (int y = y1; y <= y2; y++)
@@ -43,7 +40,6 @@ main(int argc, char *argv[])
         }
         else if (4 == sscanf(buffer, "turn off %d,%d through %d,%d", &x1, &y1, &x2, &y2))
         {
-            // turn off lights in rectangle
             for (int x = x1; x <= x2; x++)
             {
                 for (int y = y1; y <= y2; y++)
@@ -54,7 +50,6 @@ main(int argc, char *argv[])
         }
         else if (4 == sscanf(buffer, "toggle %d,%d through %d,%d", &x1, &y1, &x2, &y2))
         {
-            // toggle lights in rectangle
             for (int x = x1; x <= x2; x++)
             {
                 for (int y = y1; y <= y2; y++)
@@ -69,7 +64,7 @@ main(int argc, char *argv[])
             exit(EXIT_FAILURE);
         }
     }
-    printf("%d lights on\n", countLightsOn(&grid));
+    printf("%d total brightness\n", totalBrightness(&grid));
     freeGrid(&grid);
     fclose(p_input_file);
 }

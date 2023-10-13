@@ -3,39 +3,104 @@
 
 typedef struct
 {
-    int x;
-    int y;
+    int brightness;
 } GridPoint;
 
 typedef struct
 {
-    GridPoint *points;
-    size_t     size;
+    GridPoint **points;
     size_t     capacity;
 } Grid;
 
 void
 createGrid(Grid *grid, size_t capacity)
 {
-    grid->points = (GridPoint *)malloc(capacity * sizeof(GridPoint));
-    if (grid->points == NULL)
+    grid->points = (GridPoint **)malloc(capacity * sizeof(GridPoint *));
+    for (int i = 0; i < capacity; i++)
     {
-        // Handle memory allocation error here if needed
-        exit(1);
+        grid->points[i] = (GridPoint *)malloc(capacity * sizeof(GridPoint));
     }
-    grid->size     = 0;
     grid->capacity = capacity;
 }
 
-int
-checkGridPoint(Grid *grid, GridPoint point)
+void initLights(Grid *grid)
 {
-    for (int idx = 0; idx < grid->size; idx++)
+    for (int x = 0; x < grid->capacity; x++)
     {
-        if (grid->points[idx].x == point.x && grid->points[idx].y == point.y)
+        for (int y = 0; y < grid->capacity; y++)
         {
-            return 1;
+            grid->points[x][y].brightness = 0;
         }
     }
-    return 0;
+}
+
+void changeBrightness(GridPoint *point, int change)
+{
+    if (point->brightness + change < 0)
+    {
+        return;
+    }
+    else
+    {
+        point->brightness += change;
+    }
+}
+
+void toggleLight(Grid *grid, int x, int y)
+{
+    // increase brightness by 2
+    changeBrightness(&(grid->points[x][y]), 2);
+    // grid->points[x][y].brightness = !grid->points[x][y].brightness;
+}
+
+void turnOn(Grid *grid, int x, int y)
+{
+    // increase brightness by 1
+    changeBrightness(&(grid->points[x][y]), 1);
+    // grid->points[x][y].brightness = 1;
+}
+
+void turnOff(Grid *grid, int x, int y)
+{
+    // decrease brightness by 1
+    changeBrightness(&(grid->points[x][y]), -1);
+    // grid->points[x][y].brightness = 0;
+}
+
+int countLightsOn(Grid *grid)
+{
+    int count = 0;
+    for (int x = 0; x < grid->capacity; x++)
+    {
+        for (int y = 0; y < grid->capacity; y++)
+        {
+            if (grid->points[x][y].brightness)
+            {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+int totalBrightness(Grid *grid)
+{
+    int brightness = 0;
+    for (int x = 0; x < grid->capacity; x++)
+    {
+        for (int y = 0; y < grid->capacity; y++)
+        {
+            brightness += grid->points[x][y].brightness;
+        }
+    }
+    return brightness;
+}
+
+void freeGrid(Grid *grid)
+{
+    for (int i = 0; i < grid->capacity; i++)
+    {
+        free(grid->points[i]);
+    }
+    free(grid->points);
 }

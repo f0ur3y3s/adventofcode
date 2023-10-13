@@ -6,20 +6,23 @@
 
 typedef struct
 {
-    int x;
-    int y;
+    int brightness;
 } GridPoint;
 
 typedef struct
 {
-    GridPoint *points;
-    size_t size;
-    size_t capacity;
+    GridPoint **points;
+    size_t     capacity;
 } Grid;
 
+
 void createGrid(Grid *grid, size_t capacity);
-void growGrid(Grid *grid);
-void addGridPoint(Grid *grid, GridPoint point);
-int checkGridPoint(Grid *grid, GridPoint point);
+void initLights(Grid *grid);
+void toggleLight(Grid *grid, int x, int y);
+void turnOn(Grid *grid, int x, int y);
+void turnOff(Grid *grid, int x, int y);
+int countLightsOn(Grid *grid);
+int totalBrightness(Grid *grid);
+void freeGrid(Grid *grid);
 
 #endif  // GRID_H
