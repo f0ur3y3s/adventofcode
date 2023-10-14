@@ -78,6 +78,24 @@ int wordlist_append(wordlist_t *str_arr, char *new_string)
     return 1;
 }
 
+int wordlist_find(wordlist_t *str_arr, char *string)
+{
+    if (!str_arr)
+    {
+        return -1;
+    }
+    for (size_t idx = 0; idx < str_arr->size; idx++)
+    {
+        if (strcmp(str_arr->words[idx], string) == 0)
+        {
+            // printf("Found %s at index %ld\n", string, idx);
+            return idx;
+        }
+    }
+    // printf("Did not find %s\n", string);
+    return -1;
+}
+
 void wordlist_print(wordlist_t* str_arr)
 {
     if (!str_arr)

@@ -13,6 +13,7 @@ wordlist_t* wordlist_create(void);
 int wordlist_append(wordlist_t *str_arr, char *new_string);
 void wordlist_print(wordlist_t* str_arr);
 void wordlist_free(wordlist_t *str_arr);
+int wordlist_find(wordlist_t *str_arr, char *string);
 
 #endif
 

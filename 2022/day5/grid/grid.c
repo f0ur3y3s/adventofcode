@@ -42,45 +42,6 @@ grid_create(size_t capacity)
     return p_grid;
 }
 
-// void
-// grid_grow(grid_t *grid)
-// {
-//     size_t     new_capacity = grid->capacity * 2; // Double the capacity
-//     grid_point_t *new_points
-//         = (grid_point_t *)realloc(grid->points, new_capacity * sizeof(grid_point_t));
-//     if (new_points == NULL)
-//     {
-//         // Handle memory reallocation error here if needed
-//         exit(1);
-//     }
-//     grid->points   = new_points;
-//     grid->capacity = new_capacity;
-// }
-
-// void
-// grid_add_point(grid_t *grid, grid_point_t point)
-// {
-//     if (grid->size >= grid->capacity)
-//     {
-//         grow_grid(grid);
-//     }
-//     grid->points[grid->size] = point;
-//     grid->size++;
-// }
-
-// int
-// grid_check_point(grid_t *grid, grid_point_t point)
-// {
-//     for (int idx = 0; idx < grid->size; idx++)
-//     {
-//         if (grid->points[idx].x == point.x && grid->points[idx].y == point.y)
-//         {
-//             return 1;
-//         }
-//     }
-//     return 0;
-// }
-
 void
 grid_print(grid_t *grid)
 {
