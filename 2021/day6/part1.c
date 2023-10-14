@@ -23,7 +23,7 @@ void simulate_lanternfish(intarr_t *intarr)
                 intarr->values[i] -= 1;
             }
         }
-        intarr_print(intarr);
+        // intarr_print(intarr);
     }
 }
 

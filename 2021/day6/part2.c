@@ -4,29 +4,74 @@
 #include <string.h>
 #include "intarr/intarr.h"
 
-void simulate_lanternfish(intarr_t *intarr)
+typedef struct node {
+    int value;
+    struct node *next;
+} node_t;
+
+
+void add_node(node_t** head, int value) {
+    node_t *new_node = malloc(sizeof(node_t));
+    new_node->value = value;
+    new_node->next = *head;
+    *head = new_node;
+}
+
+void print_list(node_t *head) {
+    while (head != NULL) {
+        printf("%d,", head->value);
+        head = head->next;
+    }
+    printf("\n");
+}
+
+void free_list(node_t *head)
 {
-    // running into not enough memory errors
-    for (int day = 1; day < 81; day++)
+    node_t *next;
+    while (head != NULL)
     {
-        // iterate through each lantern fish
-        // if lantern fish value is 0, add a new lanternfish at value 8
-        // else, decrement value by 1
-        for (int i = 0; i < intarr->size; i++)
+        next = head->next;
+        free(head);
+        head = next;
+    }
+}
+
+int list_size(node_t *head)
+{
+    int size = 0;
+    while (head != NULL)
+    {
+        size++;
+        head = head->next;
+    }
+    return size;
+    // printf("Size of list: %d\n", size);
+}
+
+void simulate_lanternfish(node_t **head)
+{
+    for (int day = 1; day < 257; day++)
+    {
+        printf("Simulating day %d\n", day);
+        node_t *current_node = *head;
+        while (current_node != NULL)
         {
-            unsigned char value = (unsigned char) intarr->values[i];
-            if (value == 0)
+            if (current_node->value == 0)
             {
-                intarr_add(intarr, 9);
-                intarr->values[i] = (char) 6;
+                add_node(head, 8);
+                current_node->value = 6;
             }
             else
             {
-                intarr->values[i] = (char) (value - 1);
+                current_node->value -= 1;
             }
+            current_node = current_node->next;
         }
+        // print_list(*head);
     }
 }
+
+
 int
 main(int argc, char *argv[])
 {
@@ -50,29 +95,28 @@ main(int argc, char *argv[])
     ssize_t read;
     getline(&line, &len, p_input_file);
     line[strcspn(line, "\n")] = 0;  // Remove trailing newline
-    printf("%s\n", line);
-
-    // create intarr
-    intarr_t *intarr;
-    intarr = intarr_create();
+    // printf("%s\n", line);
 
     // parse line
     size_t size = strlen(line);
     char *token = strtok(line, ",");
 
+    node_t *head = NULL;
+
     while (token != NULL)
     {
-        intarr_add(intarr, *token);
-        // printf("%s\n", token);
+        add_node(&head, atoi(token));
         token = strtok(NULL, ",");
     }
 
+    // print_list(head);
     // simulate
-    simulate_lanternfish(intarr);
+    simulate_lanternfish(&head);
 
-    printf("There are %ld lanternfish in the lake.\n", intarr->size);
+    printf("There are %d lanternfish in the lake.\n", list_size(head));
 
-    intarr_free(intarr);
+    free_list(head);
+    // intarr_free(intarr);
     free(line);
     fclose(p_input_file);
     exit(EXIT_SUCCESS);
