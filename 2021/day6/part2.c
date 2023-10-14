@@ -7,27 +7,26 @@
 void simulate_lanternfish(intarr_t *intarr)
 {
     // running into not enough memory errors
-    for (int day = 1; day < 257; day++)
+    for (int day = 1; day < 81; day++)
     {
         // iterate through each lantern fish
         // if lantern fish value is 0, add a new lanternfish at value 8
         // else, decrement value by 1
         for (int i = 0; i < intarr->size; i++)
         {
-            if (intarr->values[i] == 0)
+            unsigned char value = (unsigned char) intarr->values[i];
+            if (value == 0)
             {
                 intarr_add(intarr, 9);
-                intarr->values[i] = 6;
+                intarr->values[i] = (char) 6;
             }
             else
             {
-                intarr->values[i] -= 1;
+                intarr->values[i] = (char) (value - 1);
             }
         }
     }
 }
-
-
 int
 main(int argc, char *argv[])
 {
@@ -63,7 +62,7 @@ main(int argc, char *argv[])
 
     while (token != NULL)
     {
-        intarr_add(intarr, atoi(token));
+        intarr_add(intarr, *token);
         // printf("%s\n", token);
         token = strtok(NULL, ",");
     }

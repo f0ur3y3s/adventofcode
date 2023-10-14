@@ -29,7 +29,7 @@ void* safe_realloc(void *ptr, size_t num_bytes, char *var_name, int line_num, co
 }
 
 typedef struct {
-    int *values;
+    char *values;
     size_t size;
     size_t capacity;
 } intarr_t;
@@ -44,7 +44,7 @@ intarr_t* intarr_create(void)
     p_intarr->size = 0;
     p_intarr->capacity = 4;
     
-    p_intarr->values = (int *)safe_malloc(4 * sizeof(p_intarr->values), "p_intarr->values", __LINE__, __func__);
+    p_intarr->values = (char *)safe_malloc(4 * sizeof(p_intarr->values), "p_intarr->values", __LINE__, __func__);
     if (!p_intarr->values) {
         free(p_intarr);
         return NULL;
@@ -53,12 +53,12 @@ intarr_t* intarr_create(void)
     return p_intarr;
 }
 
-void intarr_add(intarr_t *intarr, int new_value)
+void intarr_add(intarr_t *intarr, char new_value)
 {
     if (intarr->size == intarr->capacity)
     {
         intarr->capacity += 1;
-        intarr->values = (int *)safe_realloc(intarr->values, intarr->capacity * sizeof(intarr->values), "intarr->values", __LINE__, __func__);
+        intarr->values = (char *)safe_realloc(intarr->values, intarr->capacity * sizeof(intarr->values), "intarr->values", __LINE__, __func__);
         if (!intarr->values) {
             free(intarr);
             return;
@@ -72,7 +72,7 @@ void intarr_print(intarr_t *intarr)
 {
     for (int i = 0; i < intarr->size; i++)
     {
-        printf("%d,", intarr->values[i]);
+        printf("%c,", intarr->values[i]);
     }
     printf("\n");
 }
