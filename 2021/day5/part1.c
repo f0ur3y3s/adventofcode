@@ -63,7 +63,7 @@ main(int argc, char *argv[])
 
     int min_x = 0;
     int min_y = 0;
-    scan_file_max(p_input_file, &min_x, &min_y);    
+    scan_file_max(p_input_file, &min_x, &min_y);
     grid_t *p_grid = grid_create(min_x+1);
 
     char buffer[20];
