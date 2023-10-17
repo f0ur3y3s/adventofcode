@@ -1,5 +1,5 @@
 # adventofcode
 
-This is a repository for my advent of code solves.
+This is a repository for my Advent of Code solves.
 
-For 2021, I used python.
+Currently, I am still learning and practicing C, so most of my solves will be done in C.
