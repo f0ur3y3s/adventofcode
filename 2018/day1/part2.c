@@ -17,13 +17,13 @@ intarr_find(intarr_t *seen, int num)
 
 
 int
-scan_file(FILE *p_input_file, intarr_t *seen)
+scan_file(FILE *p_input_file, intarr_t *seen, int curr_freq)
 {
-    int curr_freq = 0;
     int change = 0;
     while (fscanf(p_input_file, "%d\n", &change) != EOF)
     {
         curr_freq += change;
+        // printf("curr_freq: %d\n", curr_freq);
         if (intarr_find(seen, curr_freq))
         {
             printf("Frequency found twice: %d\n", curr_freq);
@@ -34,9 +34,10 @@ scan_file(FILE *p_input_file, intarr_t *seen)
             intarr_add(seen, curr_freq);
         }
     }
-    intarr_print(seen);
+    // printf("Repeating file...\n");
     rewind(p_input_file);
-    return 0;
+    // intarr_print(seen);
+    return scan_file(p_input_file, seen, curr_freq);
 }
 
 
@@ -58,8 +59,9 @@ main(int argc, char *argv[])
     }
 
     intarr_t *seen = intarr_create();
-    intarr_add(seen, 0);
-    while (!scan_file(p_input_file, seen));
+    int ret = scan_file(p_input_file, seen, 0);
+    printf("Return code: %d\n", ret);
+    // while (!scan_file(p_input_file, seen));
     intarr_free(seen);
     fclose(p_input_file);
 }
