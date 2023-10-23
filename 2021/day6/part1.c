@@ -23,7 +23,7 @@ void simulate_lanternfish(intarr_t *intarr)
                 intarr->values[i] -= 1;
             }
         }
-        intarr_print(intarr);
+        //intarr_print(intarr);
     }
 }
 
@@ -51,7 +51,7 @@ main(int argc, char *argv[])
     ssize_t read;
     getline(&line, &len, p_input_file);
     line[strcspn(line, "\n")] = 0;  // Remove trailing newline
-    printf("%s\n", line);
+    // printf("%s\n", line);
 
     // create intarr
     intarr_t *intarr;
