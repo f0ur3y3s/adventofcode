@@ -58,15 +58,16 @@ main(int argc, char *argv[])
     {
         for (int crab_idx = 0; crab_idx < crab_locations->size; crab_idx++)
         {
-            fuel_arr[fuel_idx] += abs(crab_locations->values[crab_idx] - fuel_idx);
+            int n = abs(crab_locations->values[crab_idx] - fuel_idx);
+            fuel_arr[fuel_idx] += ((n * (n + 1))/2);
         }
     }
 
-    for (int i = 0; i < max+1; i++)
-    {
-        printf("%d,", fuel_arr[i]);
-    }
-    printf("\n");
+    // for (int i = 0; i < max+1; i++)
+    // {
+    //     printf("%d,", fuel_arr[i]);
+    // }
+    // printf("\n");
 
     int fuel_min = INT_MAX;
     int min_idx = 0;
