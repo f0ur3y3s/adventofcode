@@ -80,9 +80,9 @@ main(int argc, char *argv[])
     for (int widx = 0; widx < wordlist->size; widx++)
     {
         char *p_word = wordlist->words[widx];
-        int difference = 0;
         for (int idx = 0; idx < wordlist->size; idx++)
         {
+            int difference = 0;
             char *b_word = wordlist->words[idx];
             for (int cidx = 0; cidx < strlen(p_word); cidx++)
             {
@@ -91,11 +91,15 @@ main(int argc, char *argv[])
                     difference++;
                 }
             }
+            // printf("Difference: %d\n%s\n%s\n", difference, p_word, b_word);
             // wordlist_compare(wordlist->words[idx]);
             if (difference == 1)
             {
-                printf("Found one letter difference: %s\t%s\n", p_word, b_word);
+                printf("Found one letter difference\n%s\n%s\n", p_word, b_word);
             }
         }
     }
 }
+
+nvosmkcdtdbfhyxsphzgrraljq
+nvosmkcdtdbfhyxsphzgraljq
