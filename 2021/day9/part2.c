@@ -86,6 +86,7 @@ main(int argc, char *argv[])
     grid_t *basin_grid = grid_create(file_rows, file_columns);
     // look for basin
     int risk_level = 0;
+    int basin_points = 0;
     for (int curr_y = 0; curr_y < file_grid->rows; curr_y++)
     {
         for (int curr_x = 0; curr_x < file_grid->columns; curr_x++)
@@ -115,6 +116,7 @@ main(int argc, char *argv[])
             {
                 risk_level += (1 + file_grid->points[curr_y][curr_x].value);
                 basin_grid->points[curr_y][curr_x].value = 1;
+                basin_points++;
             }
         }
     }
@@ -127,38 +129,73 @@ main(int argc, char *argv[])
     // if adjacent is not 9, scan adjacent to that point
     // use recursion
 
+    int *basin_sizes = malloc(sizeof(int) * basin_points);
+
     grid_t * basin_mask_grid = NULL;
+    int count_basin = 0;
     for (int curr_y = 0; curr_y < file_grid->rows; curr_y++)
     {
         for (int curr_x = 0; curr_x < file_grid->columns; curr_x++)
         {
             if (basin_grid->points[curr_y][curr_x].value)
             {
-                printf("Found basin center: %d, %d\n", curr_x, curr_y);
+                // printf("Found basin center: %d, %d\n", curr_x, curr_y);
                 basin_mask_grid = grid_create(file_rows, file_columns);
                 get_basin_mask(basin_mask_grid, file_grid, curr_x, curr_y);
-                // get size of basin
-                int count_basin = 0;
+                int basin_size = 0;
                 for (int basin_y = 0; basin_y < file_grid->rows; basin_y++)
                 {
                     for (int basin_x = 0; basin_x < file_grid->columns; basin_x++)
                     {
                         if (basin_mask_grid->points[basin_y][basin_x].value)
                         {
-                            count_basin++;
+                            basin_size++;
                         }
                     }
                 }
-                printf("Size: %d\tBasin mask grid:\n", count_basin);
-
+                printf("Size: %d\tBasin mask grid:\n", basin_size);
+                basin_sizes[count_basin] = basin_size;
+                // printf("%d\n", basin_sizes[count_basin]);
+                count_basin++;
                 grid_print(basin_mask_grid);
                 grid_free(basin_mask_grid);
             }
         }
     }
 
+    for (int idx = 0; idx < basin_points; idx++)
+    {
+        printf("%d ", basin_sizes[idx]);
+    }
+    printf("\n");
+
+    // multiply the three largest basins
+    int largest_basins[3] = {0};
+    for (int idx = 0; idx < basin_points; idx++)
+    {
+        if (basin_sizes[idx] > largest_basins[0])
+        {
+            largest_basins[2] = largest_basins[1];
+            largest_basins[1] = largest_basins[0];
+            largest_basins[0] = basin_sizes[idx];
+        }
+        else if (basin_sizes[idx] > largest_basins[1])
+        {
+            largest_basins[2] = largest_basins[1];
+            largest_basins[1] = basin_sizes[idx];
+        }
+        else if (basin_sizes[idx] > largest_basins[2])
+        {
+            largest_basins[2] = basin_sizes[idx];
+        }
+    }
+
+    printf("Largest basins: %d, %d, %d: %d\n", largest_basins[0], largest_basins[1], largest_basins[2], largest_basins[0] * largest_basins[1] * largest_basins[2]);
+
     grid_free(file_grid);
     grid_free(basin_grid);
     fclose(p_input_file);
     free(buffer);
+    free(basin_sizes);
+    return 0;
 }
