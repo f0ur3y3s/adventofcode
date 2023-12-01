@@ -31,6 +31,6 @@ int main (int argc, char * argv[])
     {
     }
 
-    free(p_input_file);
+    fclose(p_input_file);
     free(buffer);
 }

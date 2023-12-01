@@ -121,9 +121,14 @@ int main (int argc, char * argv[])
         process_line(line, &first_digit, &last_digit);
         // create a 2 digit number
         int line_number = (first_digit * 10) + last_digit;
-        printf("--------------- line sum: %d\n", line_number);
+        // printf("--------------- line sum: %d\n", line_number);
         sum += line_number;
     }
+
     printf("Sum: %d\n", sum);
     printf("\n");
+    free(line);
+    fclose(p_input_file);
+
+    return 0;
 }
