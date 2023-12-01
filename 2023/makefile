@@ -2,7 +2,7 @@ CC=gcc
 INCLUDES=-I../aoc/
 CFLAGS=-Wall $(INCLUDES) -g
 
-SRC_NAME=part2
+SRC_NAME=part1
 DEPS = $(SRC_NAME).c
 OBJ = $(SRC_NAME).o
 EXECUTABLE=$(SRC_NAME)

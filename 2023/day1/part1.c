@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <string.h>
 #include <ctype.h>
+#include "../aoc/shared.h"
 
 int main (int argc, char * argv[])
 {
@@ -21,17 +22,16 @@ int main (int argc, char * argv[])
         exit(EXIT_FAILURE);
     }
 
-    size_t  len    = 0;
     char *  buffer = NULL;
-    ssize_t read;
-    int     sum = 0;
+    int     sum    = 0;
+    size_t  len    = 0;
+    ssize_t read   = 0;
 
     while ((read = getline(&buffer, &len, p_input_file)) > 0)
     {
-        char line_buffer[64]          = { 0 };
-        int  line_ptr                 = 0;
-        buffer[strcspn(buffer, "\n")] = '\0'; // Remove trailing '\n'
-        int first_digit = -1, last_digit = -1;
+        strsnl(buffer);
+        int first_digit = -1;
+        int last_digit  = -1;
 
         for (int index = 0; index < strlen(buffer); index++)
         {

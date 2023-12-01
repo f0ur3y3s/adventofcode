@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <string.h>
 #include <ctype.h>
+#include "../aoc/shared.h"
 
 typedef struct
 {
@@ -10,28 +11,89 @@ typedef struct
     int    digit;
 } word_digit_t;
 
-word_digit_t word_digit_map[] = {
+word_digit_t g_word_digit_map[] = {
     { "one", 1 }, { "two", 2 },   { "three", 3 }, { "four", 4 }, { "five", 5 },
-    { "six", 6 }, { "seven", 7 }, { "eight", 8 }, { "nine", 9 },
+    { "six", 6 }, { "seven", 7 }, { "eight", 8 }, { "nine", 9 }, { "0", 0 },
+    { "1", 1 },   { "2", 2 },     { "3", 3 },     { "4", 4 },    { "5", 5 },
+    { "6", 6 },   { "7", 7 },     { "8", 8 },     { "9", 9 },
 };
 
 // return -1 if the word is not found
 int get_digit_from_word (const char * word)
 {
-    int size = sizeof(word_digit_map) / sizeof(word_digit_map[0]);
+    int size = sizeof(g_word_digit_map) / sizeof(g_word_digit_map[0]);
     for (int i = 0; i < size; i++)
     {
-        if (strcmp(word_digit_map[i].word, word) == 0)
+        if (0 == strcmp(g_word_digit_map[i].word, word))
         {
-            return word_digit_map[i].digit;
+            return g_word_digit_map[i].digit;
         }
     }
     return -1;
 }
 
+void process_line (char * line, int * first_digit, int * last_digit)
+{
+    // scan the string with a sliding window
+    // the window starts at the beginning of the string
+    // eightwothree
+    // e
+    // ei
+    // eig
+    // eigh
+    // eight
+    // here we know that eight is a digit
+    // so we set first_digit to 8
+    // then we slide the window to the right by one
+
+    char substring_line[64] = { 0 };
+
+    int start_index = 0;
+    for (; start_index <= strlen(line); start_index++)
+    {
+        int end_index = start_index + 1;
+        int backstop  = strlen(line);
+        for (; end_index <= backstop; end_index++)
+        {
+            memcpy(substring_line, line + start_index, end_index - start_index);
+            int substring_index
+                = end_index - start_index - 1; // -1 for indexing
+            printf("S: %d\tE: %d\tSI: %d\tFirst:  %d\tLast:  %d\t%s\n",
+                   start_index,
+                   end_index,
+                   substring_index,
+                   *first_digit,
+                   *last_digit,
+                   substring_line);
+            int word_digit = get_digit_from_word(substring_line);
+
+            if (-1 != word_digit)
+            {
+
+                if (*first_digit == -1)
+                {
+                    *first_digit = word_digit;
+                }
+                *last_digit = word_digit;
+                break;
+            }
+
+            int check_end
+                = get_digit_from_word(&substring_line[substring_index]);
+
+            if (-1 != check_end)
+            {
+                backstop = end_index;
+                continue;
+            }
+        }
+        memset(substring_line, 0, sizeof(substring_line));
+    }
+}
+
 int main (int argc, char * argv[])
 {
-    if (argc != 2)
+    if (2 != argc)
     {
         printf("Usage: %s [file]\n", argv[0]);
         exit(EXIT_FAILURE);
@@ -46,66 +108,22 @@ int main (int argc, char * argv[])
         exit(EXIT_FAILURE);
     }
 
-    size_t  len    = 0;
-    char *  buffer = NULL;
-    ssize_t read;
-    int     sum = 0;
+    char *  line = NULL;
+    int     sum  = 0;
+    size_t  len  = 0;
+    ssize_t read = 0;
 
-    while ((read = getline(&buffer, &len, p_input_file)) > 0)
+    while ((read = getline(&line, &len, p_input_file)) > 0)
     {
-        char line_buffer[64]          = { 0 };
-        int  line_ptr                 = 0;
-        buffer[strcspn(buffer, "\n")] = '\0'; // Remove trailing '\n'
-        int first_digit = -1, last_digit = -1;
-
-        // scan the string with a sliding window
-        // the window starts at the beginning of the string
-        // eightwothree
-        // e
-        // ei
-        // eig
-        // eigh
-        // eight
-        // here we know that eight is a digit
-        // so we set first_digit to 8
-        // and last_digit to 8
-        // then we slide the window to the right
-
-        char substring_buffer[64] = { 0 };
-        for (int start_index = 0; start_index <= strlen(buffer); start_index++)
-        {
-            for (int end_index = start_index; end_index <= strlen(buffer); end_index++)
-            {
-                memcpy(substring_buffer, buffer + start_index, end_index - start_index);
-                int word_digit = get_digit_from_word(substring_buffer);
-                if (word_digit != -1)
-                {
-                    if (first_digit == -1)
-                    {
-                        first_digit = word_digit;
-                    }
-                    last_digit = word_digit;
-                }
-                if (isdigit(substring_buffer[0]))
-                {
-                    if (first_digit == -1)
-                    {
-                        first_digit = substring_buffer[0] - '0';
-                    }
-                    last_digit = substring_buffer[0] - '0';
-                }
-            }
-            memset(substring_buffer, 0, sizeof(substring_buffer));
-        }
-
-
+        strsnl(line);
+        int first_digit = -1;
+        int last_digit  = -1;
+        process_line(line, &first_digit, &last_digit);
         // create a 2 digit number
         int line_number = (first_digit * 10) + last_digit;
-        printf("%d\n", line_number);
+        printf("--------------- line sum: %d\n", line_number);
         sum += line_number;
     }
     printf("Sum: %d\n", sum);
     printf("\n");
-    free(p_input_file);
-    free(buffer);
 }
