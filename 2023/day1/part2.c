@@ -58,13 +58,13 @@ void process_line (char * line, int * first_digit, int * last_digit)
             memcpy(substring_line, line + start_index, end_index - start_index);
             int substring_index
                 = end_index - start_index - 1; // -1 for indexing
-            printf("S: %d\tE: %d\tSI: %d\tFirst:  %d\tLast:  %d\t%s\n",
-                   start_index,
-                   end_index,
-                   substring_index,
-                   *first_digit,
-                   *last_digit,
-                   substring_line);
+            // printf("S: %d\tE: %d\tSI: %d\tFirst:  %d\tLast:  %d\t%s\n",
+            //        start_index,
+            //        end_index,
+            //        substring_index,
+            //        *first_digit,
+            //        *last_digit,
+            //        substring_line);
             int word_digit = get_digit_from_word(substring_line);
 
             if (-1 != word_digit)
