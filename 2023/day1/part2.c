@@ -65,6 +65,7 @@ void process_line (char * line, int * first_digit, int * last_digit)
             //        *first_digit,
             //        *last_digit,
             //        substring_line);
+            printf("%s\n", substring_line);
             int word_digit = get_digit_from_word(substring_line);
 
             if (-1 != word_digit)
