@@ -10,8 +10,6 @@
 #define NUM_OFFSET  3
 #define SEP_OFFSET  2
 
-// #define NUM_OFFSET 10
-
 int main (int argc, char * argv[])
 {
     if (argc != 2)
@@ -39,33 +37,26 @@ int main (int argc, char * argv[])
         intarr_t * p_winning = intarr_create();
         intarr_t * p_card    = intarr_create();
 
-        int card_number;
-
         strsnl(buffer);
+
+        int    card_number  = 0;
         char * p_line       = strdup(buffer);
         char * p_line_start = p_line;
-        p_line              = p_line + CARD_OFFSET;
-        // printf("%s\n", p_line);
+        p_line              = p_line + CARD_OFFSET; // skip "Card n  : "
+
         while (sscanf(p_line, "%d ", &card_number) == 1)
         {
             p_line = p_line + NUM_OFFSET;
             intarr_add(p_winning, card_number);
         }
 
-        p_line = p_line + SEP_OFFSET; // skip |
-        // printf("-----\n");
+        p_line = p_line + SEP_OFFSET; // skip " | "
 
         while (sscanf(p_line, "%d ", &card_number) == 1)
         {
             p_line = p_line + NUM_OFFSET;
             intarr_add(p_card, card_number);
         }
-        // intarr_print(p_winning);
-        // intarr_print(p_card);
-
-        // check if each num in p_card is in p_winning
-        // if sum is 0, make sum 1
-        // else double sum
 
         int card_points = 0;
         for (int p_card_idx = 0; p_card_idx < p_card->size; p_card_idx++)
@@ -84,7 +75,6 @@ int main (int argc, char * argv[])
                     {
                         card_points *= 2;
                     }
-                    // sum += p_card->values[p_card_idx];
                 }
             }
         }
