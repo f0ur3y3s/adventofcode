@@ -16,61 +16,40 @@ def parse_data(filename):
     return data
 
 
-def apply_mapping(mapping, seeds):
-    # mapping = dst range start, src range start, range length
-    dst_start = mapping[0]
-    src_start = mapping[1]
-    range_len = mapping[2]
-    src_end = src_start + range_len - 1
-    dst_end = dst_start + range_len - 1
-    print("-" * 50)
-    print(f"SRC Range: {src_start} - {src_end}")
-    print(f"DST Range: {dst_start} - {dst_end}")
-    print(f"Seeds: {seeds}")
-
-    new_seeds = seeds
-    for seed, mod in seeds.items():
-        if mod == 0:
-            if seed in range(src_start, src_end + 1):
+def apply_mapping(mapping_arr, seeds):
+    changed_idx = set()
+    for mapping in mapping_arr:
+        dst_start = mapping[0]
+        src_start = mapping[1]
+        range_len = mapping[2]
+        src_end = src_start + range_len
+        dst_end = dst_start + range_len
+        src_range = [*range(src_start, src_end)]
+        # print("-" * 50)
+        # print(f"SRC Range: {src_start} - {src_end - 1}")
+        # print(f"DST Range: {dst_start} - {dst_end - 1}")
+        # print(f"Seeds: {seeds}")
+        for idx, seed in enumerate(seeds):
+            if seed in src_range and idx not in changed_idx:
                 translated_seed = dst_start + (seed - src_start)
-                # new_seeds[seed] = 1
-                # new_seeds[translated_seed] = new_seeds.pop(seed)
-    print(f"New seeds: {new_seeds}")
-
-    # for idx, seed in enumerate(seeds):
-    #     if seed in range(src_start, src_end + 1):
-    #         translated_seed = dst_start + (seed - src_start)
-    #         # print(f"translation\t{seed}\t{translated_seed}")
-    #         seeds[idx] = translated_seed
-    #         print(seeds)
-
-    print("-" * 50)
-    return new_seeds
+                # print(f"Translation: {seed} -> {translated_seed}")
+                seeds[idx] = translated_seed
+                changed_idx.add(idx)
+    # print(f"Seeds: {seeds}")
+    # print("-" * 50)
+    return seeds
 
 
-data = parse_data("test.txt")
+data = parse_data("input.txt")
 seeds = data["seeds"][0]
 data.pop("seeds", None)
 
-# new_seeds = {}
-# for seed in seeds:
-#     new_seeds[seed] = 0
-# print(new_seeds)
-def gen_new_seeds(seeds):
-    new_seeds = {}
-    for seed in seeds:
-        new_seeds[seed] = 0
-    return new_seeds
+# print(data)
 
-print(data)
 for title, mapping_arr in data.items():
-    new_seeds = gen_new_seeds(seeds)
-    print(new_seeds)
-    print(f"\n\tTitle: {title}\n")
-    for row in mapping_arr:
-        print(row)
-        seeds = apply_mapping(row, new_seeds)
-    print(seeds)
+    # print(f"\n\tTitle: {title}\n")
+    seeds = apply_mapping(mapping_arr, seeds)
+
 print(min(seeds))
 
 
