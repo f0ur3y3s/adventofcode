@@ -1,7 +1,9 @@
 import numpy as np
+import os
+ROOT = os.path.dirname(os.path.abspath(__file__))
 
 def parse_data(filename):
-    with open(filename, "r") as file:
+    with open(os.path.join(ROOT, filename), "r") as file:
         raw_data = file.read()
 
     sections = [section.strip() for section in raw_data.strip().split("\n\n")]
@@ -45,10 +47,10 @@ def gen_seed_ranges(seeds):
 
     return new_seeds
 
+
 data = parse_data("input.txt")
 seeds = data["seeds"][0]
 data.pop("seeds", None)
-
 
 
 for title, mapping_arr in data.items():

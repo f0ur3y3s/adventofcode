@@ -1,8 +1,10 @@
 from tqdm import tqdm
+import os
+ROOT = os.path.dirname(os.path.abspath(__file__))
 
 def parse_data(filename):
     # dont forget to add a new line in the input file
-    with open(filename, "r") as file:
+    with open(os.path.join(ROOT, filename), "r") as file:
         raw_data = file.read()
 
     sections = [section.strip() for section in raw_data.strip().split("\n\n")]
@@ -40,6 +42,25 @@ def apply_mapping(mapping_arr, seeds):
     # print("-" * 50)
     return seeds
 
+
+# data = parse_data("test.txt")
+data = parse_data("input.txt")
+seeds = data["seeds"][0]
+data.pop("seeds", None)
+
+
+def batch_gen_seed_ranges(seeds):
+    batch_min = []
+    new_seeds = []
+    for seed_start, seed_range in (zip(seeds[::2], seeds[1::2])):
+        for seed in tqdm(range(seed_start, seed_start + seed_range), desc=f"{seed_start} - {seed_start + seed_range}"):
+            new_seeds.append(seed)
+        for title, mapping_arr in tqdm(data.items()):
+            print(f"\n\tTitle: {title}\n")
+            batch_min.append(min(apply_mapping(mapping_arr, seeds)))
+        new_seeds = []
+    return batch_min
+
 def gen_seed_ranges(seeds):
     new_seeds = []
     for seed_start, seed_range in (zip(seeds[::2], seeds[1::2])):
@@ -47,10 +68,7 @@ def gen_seed_ranges(seeds):
             new_seeds.append(seed)
     return new_seeds
 
-data = parse_data("input.txt")
-seeds = data["seeds"][0]
-data.pop("seeds", None)
-
+# print(min(batch_gen_seed_ranges(seeds)))
 seeds = (gen_seed_ranges(seeds))
 
 for title, mapping_arr in tqdm(data.items()):
@@ -58,3 +76,5 @@ for title, mapping_arr in tqdm(data.items()):
     seeds = apply_mapping(mapping_arr, seeds)
 
 print(min(seeds))
+
+# not 15824964
